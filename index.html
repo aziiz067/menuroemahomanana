@@ -3,77 +3,247 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dokumen PDF ke Web</title>
+  <title>Buku Flip Sederhana</title>
   <style>
     body {
       background: #e0e0e0;
       margin: 0;
-      padding: 30px 10px;
+      padding: 20px 10px;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .book-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      width: 100%;
+      max-width: 900px;
     }
 
     .book {
-      display: flex;
-      flex-direction: column;
-      gap: 40px;
-      align-items: center;
+      width: 100%;
+      max-width: 794px;
+      aspect-ratio: 210/297; /* Proporsi A4 yang benar: 210mm x 297mm */
+      position: relative;
+      perspective: 1000px;
+      min-height: 400px;
     }
 
     .page {
-      width: 794px; /* A4 size width */
+      width: 100%;
+      height: 100%;
       background: white;
-      box-shadow: 0 0 12px rgba(0,0,0,0.2);
-      position: relative;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: all 0.3s ease;
+    }
+
+    .page.active {
+      opacity: 1;
+      transform: translateX(0);
+      z-index: 10;
+    }
+
+    .page.prev {
+      opacity: 0;
+      transform: translateX(-100%);
     }
 
     .page img {
       width: 100%;
-      height: auto;
-      display: block;
+      height: 100%;
+      object-fit: contain;
+      background: white;
     }
 
-    .footer {
+    .controls {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 0 10px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: clamp(8px, 2vw, 12px) clamp(16px, 4vw, 24px);
+      font-size: clamp(14px, 2.5vw, 16px);
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.2s;
+      white-space: nowrap;
+    }
+
+    button:hover {
+      background: #45a049;
+    }
+
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .page-info {
+      font-size: clamp(16px, 3vw, 18px);
+      font-weight: bold;
+      color: #333;
+      margin: 0 15px;
+    }
+
+    /* Mobile optimization */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px 5px;
+      }
+      
+      .book-container {
+        gap: 15px;
+      }
+      
+      .book {
+        min-height: 500px; /* Disesuaikan dengan proporsi A4 */
+      }
+      
+      .controls {
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .book {
+        min-height: 450px; /* Disesuaikan dengan proporsi A4 */
+      }
+      
+      .controls {
+        margin-bottom: 10px;
+      }
+    }
+
+    /* Fallback untuk gambar yang tidak ada */
+    .page img {
+      background: #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+      font-size: clamp(18px, 4vw, 24px);
       text-align: center;
-      font-size: 14px;
-      color: #444;
-      padding: 10px 0;
-      border-top: 1px solid #ddd;
-      background: #fafafa;
     }
   </style>
 </head>
 <body>
+      <div class="book-container">
+    <div class="controls">
+      <button id="prevBtn" onclick="prevPage()">← Sebelumnya</button>
+      <div class="page-info">
+        <span id="currentPage">1</span> / <span id="totalPages">7</span>
+      </div>
+      <button id="nextBtn" onclick="nextPage()">Selanjutnya →</button>
+    </div>
 
-  <div class="book">
-    <div class="page">
-      <img src="1.jpg" alt="Halaman 1" />
-      <div class="footer">Halaman 1</div>
-    </div>
-    <div class="page">
-      <img src="2.jpg" alt="Halaman 2" />
-      <div class="footer">Halaman 2</div>
-    </div>
-    <div class="page">
-      <img src="3.jpg" alt="Halaman 3" />
-      <div class="footer">Halaman 3</div>
-    </div>
-    <div class="page">
-      <img src="4.jpg" alt="Halaman 4" />
-      <div class="footer">Halaman 4</div>
-    </div>
-    <div class="page">
-      <img src="5.jpg" alt="Halaman 5" />
-      <div class="footer">Halaman 5</div>
-    </div>
-    <div class="page">
-      <img src="6.jpg" alt="Halaman 6" />
-      <div class="footer">Halaman 6</div>
-    </div>
-    <div class="page">
-      <img src="7.jpg" alt="Halaman 7" />
-      <div class="footer">Halaman 7</div>
+    <div class="book">
+      <div class="page active" data-page="1">
+        <img src="1.jpg" alt="Gambar 1" onerror="this.innerHTML='Gambar 1<br>Gambar tidak ditemukan';" />
+      </div>
+      <div class="page" data-page="2">
+        <img src="2.jpg" alt="Gambar 2" onerror="this.innerHTML='Gambar 2<br>Gambar tidak ditemukan';" />
+      </div>
+      <div class="page" data-page="3">
+        <img src="3.jpg" alt="Gambar 3" onerror="this.innerHTML='Gambar 3<br>Gambar tidak ditemukan';" />
+      </div>
+      <div class="page" data-page="4">
+        <img src="4.jpg" alt="Gambar 4" onerror="this.innerHTML='Gambar 4<br>Gambar tidak ditemukan';" />
+      </div>
+      <div class="page" data-page="5">
+        <img src="5.jpg" alt="Gambar 5" onerror="this.innerHTML='Gambar 5<br>Gambar tidak ditemukan';" />
+      </div>
+      <div class="page" data-page="6">
+        <img src="6.jpg" alt="Gambar 6" onerror="this.innerHTML='Gambar 6<br>Gambar tidak ditemukan';" />
+      </div>
+      <div class="page" data-page="7">
+        <img src="7.jpg" alt="Gambar 7" onerror="this.innerHTML='Gambar 7<br>Gambar tidak ditemukan';" />
+      </div>
     </div>
   </div>
 
+  <script>
+    let currentPageNum = 1;
+    const totalPages = 7;
+
+    function updatePage() {
+      // Sembunyikan semua halaman
+      const pages = document.querySelectorAll('.page');
+      pages.forEach(page => {
+        page.classList.remove('active', 'prev');
+      });
+
+      // Tampilkan halaman aktif
+      const activePage = document.querySelector(`[data-page="${currentPageNum}"]`);
+      if (activePage) {
+        activePage.classList.add('active');
+      }
+
+      // Update info halaman
+      document.getElementById('currentPage').textContent = currentPageNum;
+
+      // Update tombol
+      document.getElementById('prevBtn').disabled = currentPageNum <= 1;
+      document.getElementById('nextBtn').disabled = currentPageNum >= totalPages;
+    }
+
+    function nextPage() {
+      if (currentPageNum < totalPages) {
+        const currentPage = document.querySelector(`[data-page="${currentPageNum}"]`);
+        currentPage.classList.add('prev');
+        
+        currentPageNum++;
+        
+        setTimeout(() => {
+          updatePage();
+        }, 150);
+      }
+    }
+
+    function prevPage() {
+      if (currentPageNum > 1) {
+        const currentPage = document.querySelector(`[data-page="${currentPageNum}"]`);
+        currentPage.classList.remove('active');
+        
+        currentPageNum--;
+        
+        setTimeout(() => {
+          updatePage();
+        }, 150);
+      }
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'ArrowLeft') {
+        prevPage();
+      } else if (e.key === 'ArrowRight') {
+        nextPage();
+      }
+    });
+
+    // Initialize
+    updatePage();
+  </script>
 </body>
 </html>
