@@ -8,7 +8,7 @@
     body {
       background: #e0e0e0;
       margin: 0;
-      padding: 20px 10px;
+      padding: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       display: flex;
       justify-content: center;
@@ -23,6 +23,8 @@
       gap: 20px;
       width: 100%;
       max-width: 900px;
+      height: 100vh;
+      padding: 0;
     }
 
     .book {
@@ -31,7 +33,7 @@
       aspect-ratio: 210/297; /* Proporsi A4 yang benar: 210mm x 297mm */
       position: relative;
       perspective: 1000px;
-      min-height: 400px;
+      flex: 1;
     }
 
     .page {
@@ -73,8 +75,10 @@
       align-items: center;
       flex-wrap: wrap;
       justify-content: center;
-      padding: 0 10px;
-      margin-bottom: 20px;
+      padding: 20px 10px;
+      background: rgba(255, 255, 255, 0.9);
+      width: 100%;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
     }
 
     button {
@@ -107,31 +111,19 @@
 
     /* Mobile optimization */
     @media (max-width: 768px) {
-      body {
-        padding: 10px 5px;
-      }
-      
       .book-container {
-        gap: 15px;
-      }
-      
-      .book {
-        min-height: 500px; /* Disesuaikan dengan proporsi A4 */
+        gap: 0;
       }
       
       .controls {
         gap: 10px;
-        margin-bottom: 15px;
+        padding: 15px 10px;
       }
     }
 
     @media (max-width: 480px) {
-      .book {
-        min-height: 450px; /* Disesuaikan dengan proporsi A4 */
-      }
-      
       .controls {
-        margin-bottom: 10px;
+        padding: 12px 5px;
       }
     }
 
@@ -149,14 +141,6 @@
 </head>
 <body>
       <div class="book-container">
-    <div class="controls">
-      <button id="prevBtn" onclick="prevPage()">← Sebelumnya</button>
-      <div class="page-info">
-        <span id="currentPage">1</span> / <span id="totalPages">7</span>
-      </div>
-      <button id="nextBtn" onclick="nextPage()">Selanjutnya →</button>
-    </div>
-
     <div class="book">
       <div class="page active" data-page="1">
         <img src="1.jpg" alt="Gambar 1" onerror="this.innerHTML='Gambar 1<br>Gambar tidak ditemukan';" />
@@ -179,6 +163,14 @@
       <div class="page" data-page="7">
         <img src="7.jpg" alt="Gambar 7" onerror="this.innerHTML='Gambar 7<br>Gambar tidak ditemukan';" />
       </div>
+    </div>
+
+    <div class="controls">
+      <button id="prevBtn" onclick="prevPage()">← Sebelumnya</button>
+      <div class="page-info">
+        <span id="currentPage">1</span> / <span id="totalPages">7</span>
+      </div>
+      <button id="nextBtn" onclick="nextPage()">Selanjutnya →</button>
     </div>
   </div>
 
