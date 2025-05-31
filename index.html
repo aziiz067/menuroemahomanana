@@ -1,254 +1,417 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Buku Flip Sederhana</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeri Gambar A4 Responsif</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    html, body {
-      height: 100vh;
-      overflow: hidden;
-      background: #e0e0e0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
 
-    .book-container {
-      display: flex;
-      flex-direction: column;
-      width: 100vw;
-      height: 100vh;
-    }
+        .gallery-container {
+            max-width: 900px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+        }
 
-    .book {
-      flex: 1;
-      width: 100%;
-      position: relative;
-      perspective: 1000px;
-      background: #e0e0e0;
-    }
+        .gallery-header {
+            background: linear-gradient(135deg, #025253 0%, #03696a 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
 
-    .page {
-      width: 100%;
-      height: 100%;
-      background: white;
-      position: absolute;
-      top: 0;
-      left: 0;
-      display: flex;
-      flex-direction: column;
-      opacity: 0;
-      transform: translateX(100%);
-      transition: all 0.3s ease;
-    }
+        .gallery-header h1 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
 
-    .page.active {
-      opacity: 1;
-      transform: translateX(0);
-      z-index: 10;
-    }
+        .gallery-header p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
 
-    .page.prev {
-      opacity: 0;
-      transform: translateX(-100%);
-    }
+        .image-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            overflow: hidden;
+            background: #f8f9fa;
+        }
 
-    .page img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      background: white;
-    }
+        .image-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            transform: translateX(100px);
+        }
 
-    .controls {
-      display: flex;
-      gap: 15px;
-      align-items: center;
-      justify-content: center;
-      padding: 12px;
-      background: rgba(255, 255, 255, 0.95);
-      border-top: 1px solid #ddd;
-      min-height: 60px;
-    }
+        .image-slide.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
 
-    button {
-      background: #4CAF50;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-      border-radius: 5px;
-      transition: background-color 0.2s;
-      white-space: nowrap;
-    }
+        .image-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: white;
+        }
 
-    button:hover {
-      background: #45a049;
-    }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background: white;
+        }
 
-    button:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
+        .nav-button {
+            background: #025253;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-width: 120px;
+            box-shadow: 0 4px 15px rgba(2, 82, 83, 0.3);
+        }
 
-    .page-info {
-      font-size: 18px;
-      font-weight: bold;
-      color: #333;
-      margin: 0 15px;
-    }
+        .nav-button:hover {
+            background: #03696a;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(2, 82, 83, 0.4);
+        }
 
-    /* Mobile optimization */
-    @media (max-width: 768px) {
-      .controls {
-        padding: 10px;
-        gap: 10px;
-        min-height: 55px;
-      }
-      
-      button {
-        padding: 8px 16px;
-        font-size: 14px;
-      }
-      
-      .page-info {
-        font-size: 16px;
-        margin: 0 10px;
-      }
-    }
+        .nav-button:active {
+            transform: translateY(0) scale(0.98);
+            box-shadow: 0 2px 10px rgba(2, 82, 83, 0.3);
+        }
 
-    @media (max-width: 480px) {
-      .controls {
-        padding: 8px;
-        min-height: 50px;
-      }
-      
-      button {
-        padding: 6px 12px;
-        font-size: 13px;
-      }
-      
-      .page-info {
-        font-size: 14px;
-        margin: 0 8px;
-      }
-    }
+        .nav-button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
 
-    /* Fallback untuk gambar yang tidak ada */
-    .page img {
-      background: #f0f0f0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #999;
-      font-size: 24px;
-      text-align: center;
-    }
-  </style>
+        .nav-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transition: all 0.6s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .nav-button:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .image-counter {
+            background: #025253;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 2px 10px rgba(2, 82, 83, 0.2);
+        }
+
+        .indicators {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 20px;
+            background: white;
+        }
+
+        .indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ddd;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator.active {
+            background: #025253;
+            transform: scale(1.2);
+        }
+
+        .indicator:hover {
+            background: #03696a;
+            transform: scale(1.1);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .gallery-container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            .gallery-header {
+                padding: 15px;
+            }
+
+            .gallery-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .image-container {
+                height: 400px;
+            }
+
+            .controls {
+                padding: 15px 20px;
+                flex-wrap: wrap;
+                gap: 15px;
+                justify-content: center;
+            }
+
+            .nav-button {
+                padding: 10px 20px;
+                font-size: 14px;
+                min-width: 100px;
+            }
+
+            .indicators {
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .gallery-header h1 {
+                font-size: 1.3rem;
+            }
+
+            .image-container {
+                height: 300px;
+            }
+
+            .controls {
+                padding: 10px 15px;
+            }
+
+            .nav-button {
+                padding: 8px 16px;
+                font-size: 13px;
+                min-width: 90px;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            font-size: 18px;
+            color: #025253;
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
+        }
+    </style>
 </head>
 <body>
-  <div class="book-container">
-    <div class="book">
-      <div class="page active" data-page="1">
-        <img src="1.jpg" alt="Gambar 1" onerror="this.innerHTML='Gambar 1<br>Gambar tidak ditemukan';" />
-      </div>
-      <div class="page" data-page="2">
-        <img src="2.jpg" alt="Gambar 2" onerror="this.innerHTML='Gambar 2<br>Gambar tidak ditemukan';" />
-      </div>
-      <div class="page" data-page="3">
-        <img src="3.jpg" alt="Gambar 3" onerror="this.innerHTML='Gambar 3<br>Gambar tidak ditemukan';" />
-      </div>
-      <div class="page" data-page="4">
-        <img src="4.jpg" alt="Gambar 4" onerror="this.innerHTML='Gambar 4<br>Gambar tidak ditemukan';" />
-      </div>
-      <div class="page" data-page="5">
-        <img src="5.jpg" alt="Gambar 5" onerror="this.innerHTML='Gambar 5<br>Gambar tidak ditemukan';" />
-      </div>
-      <div class="page" data-page="6">
-        <img src="6.jpg" alt="Gambar 6" onerror="this.innerHTML='Gambar 6<br>Gambar tidak ditemukan';" />
-      </div>
-      <div class="page" data-page="7">
-        <img src="7.jpg" alt="Gambar 7" onerror="this.innerHTML='Gambar 7<br>Gambar tidak ditemukan';" />
-      </div>
+    <div class="gallery-container">
+        <div class="gallery-header">
+            <h1>Galeri Gambar A4</h1>
+            <p>Koleksi gambar dalam format A4 yang responsif</p>
+        </div>
+
+        <div class="image-container" id="imageContainer">
+            <div class="image-slide active">
+                <img src="1.jpg" alt="Gambar 1" loading="lazy">
+            </div>
+            <div class="image-slide">
+                <img src="2.jpg" alt="Gambar 2" loading="lazy">
+            </div>
+            <div class="image-slide">
+                <img src="3.jpg" alt="Gambar 3" loading="lazy">
+            </div>
+            <div class="image-slide">
+                <img src="4.jpg" alt="Gambar 4" loading="lazy">
+            </div>
+            <div class="image-slide">
+                <img src="5.jpg" alt="Gambar 5" loading="lazy">
+            </div>
+            <div class="image-slide">
+                <img src="6.jpg" alt="Gambar 6" loading="lazy">
+            </div>
+            <div class="image-slide">
+                <img src="7.jpg" alt="Gambar 7" loading="lazy">
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="nav-button" id="prevBtn" onclick="prevImage()">
+                ← Sebelumnya
+            </button>
+            
+            <div class="image-counter">
+                <span id="currentIndex">1</span> / <span id="totalImages">7</span>
+            </div>
+            
+            <button class="nav-button" id="nextBtn" onclick="nextImage()">
+                Selanjutnya →
+            </button>
+        </div>
+
+        <div class="indicators" id="indicators">
+            <div class="indicator active" onclick="goToImage(0)"></div>
+            <div class="indicator" onclick="goToImage(1)"></div>
+            <div class="indicator" onclick="goToImage(2)"></div>
+            <div class="indicator" onclick="goToImage(3)"></div>
+            <div class="indicator" onclick="goToImage(4)"></div>
+            <div class="indicator" onclick="goToImage(5)"></div>
+            <div class="indicator" onclick="goToImage(6)"></div>
+        </div>
     </div>
-    
-    <div class="controls">
-      <button id="prevBtn" onclick="prevPage()">← Sebelumnya</button>
-      <div class="page-info">
-        <span id="currentPage">1</span> / <span id="totalPages">7</span>
-      </div>
-      <button id="nextBtn" onclick="nextPage()">Selanjutnya →</button>
-    </div>
-  </div>
 
-  <script>
-    let currentPageNum = 1;
-    const totalPages = 7;
+    <script>
+        let currentImageIndex = 0;
+        const totalImages = 7;
+        const slides = document.querySelectorAll('.image-slide');
+        const indicators = document.querySelectorAll('.indicator');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const currentIndexSpan = document.getElementById('currentIndex');
 
-    function updatePage() {
-      // Sembunyikan semua halaman
-      const pages = document.querySelectorAll('.page');
-      pages.forEach(page => {
-        page.classList.remove('active', 'prev');
-      });
+        function updateGallery() {
+            // Update slides
+            slides.forEach((slide, index) => {
+                slide.classList.toggle('active', index === currentImageIndex);
+            });
 
-      // Tampilkan halaman aktif
-      const activePage = document.querySelector(`[data-page="${currentPageNum}"]`);
-      if (activePage) {
-        activePage.classList.add('active');
-      }
+            // Update indicators
+            indicators.forEach((indicator, index) => {
+                indicator.classList.toggle('active', index === currentImageIndex);
+            });
 
-      // Update info halaman
-      document.getElementById('currentPage').textContent = currentPageNum;
+            // Update counter
+            currentIndexSpan.textContent = currentImageIndex + 1;
 
-      // Update tombol
-      document.getElementById('prevBtn').disabled = currentPageNum <= 1;
-      document.getElementById('nextBtn').disabled = currentPageNum >= totalPages;
-    }
+            // Update button states
+            prevBtn.disabled = currentImageIndex === 0;
+            nextBtn.disabled = currentImageIndex === totalImages - 1;
+        }
 
-    function nextPage() {
-      if (currentPageNum < totalPages) {
-        const currentPage = document.querySelector(`[data-page="${currentPageNum}"]`);
-        currentPage.classList.add('prev');
-        
-        currentPageNum++;
-        
-        setTimeout(() => {
-          updatePage();
-        }, 150);
-      }
-    }
+        function nextImage() {
+            if (currentImageIndex < totalImages - 1) {
+                currentImageIndex++;
+                updateGallery();
+            }
+        }
 
-    function prevPage() {
-      if (currentPageNum > 1) {
-        const currentPage = document.querySelector(`[data-page="${currentPageNum}"]`);
-        currentPage.classList.remove('active');
-        
-        currentPageNum--;
-        
-        setTimeout(() => {
-          updatePage();
-        }, 150);
-      }
-    }
+        function prevImage() {
+            if (currentImageIndex > 0) {
+                currentImageIndex--;
+                updateGallery();
+            }
+        }
 
-    // Keyboard navigation
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'ArrowLeft') {
-        prevPage();
-      } else if (e.key === 'ArrowRight') {
-        nextPage();
-      }
-    });
+        function goToImage(index) {
+            currentImageIndex = index;
+            updateGallery();
+        }
 
-    // Initialize
-    updatePage();
-  </script>
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                prevImage();
+            } else if (e.key === 'ArrowRight') {
+                nextImage();
+            }
+        });
+
+        // Touch/swipe support
+        let startX = 0;
+        let endX = 0;
+
+        document.getElementById('imageContainer').addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+        });
+
+        document.getElementById('imageContainer').addEventListener('touchend', (e) => {
+            endX = e.changedTouches[0].clientX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const threshold = 50;
+            const diff = startX - endX;
+
+            if (Math.abs(diff) > threshold) {
+                if (diff > 0) {
+                    nextImage(); // Swipe left - next image
+                } else {
+                    prevImage(); // Swipe right - previous image
+                }
+            }
+        }
+
+        // Initialize
+        updateGallery();
+
+        // Auto-play (optional - uncomment to enable)
+        /*
+        setInterval(() => {
+            if (currentImageIndex < totalImages - 1) {
+                nextImage();
+            } else {
+                currentImageIndex = 0;
+                updateGallery();
+            }
+        }, 5000);
+        */
+    </script>
 </body>
 </html>
